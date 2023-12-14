@@ -1,21 +1,20 @@
 import React from 'react';
-import { App, Group, Note } from './app_schema';
-import { deleteGroup, moveItem } from './helpers';
+import { App, Group, Note } from '../schema/app_schema';
+import { deleteGroup, moveItem } from '../utils/app_helpers';
 import { ConnectableElement, useDrag, useDrop } from 'react-dnd';
 import { NoteContainer } from './noteux';
 import { DeleteButton } from './buttonux';
-import { dragType } from './utils';
-import { Session } from './session_schema';
+import { dragType } from '../utils/utils';
+import { Session } from '../schema/session_schema';
 
 export function GroupView(props: {
     group: Group;
     clientId: string;
-    app: App;
-    selection: Note[];
-    setSelection: any;
+    app: App;    
     session: Session;
+    fluidMembers: string[];
 }): JSX.Element {
-    const [{ isDragging }, drag] = useDrag(() => ({
+    const [, drag] = useDrag(() => ({
         type: dragType.GROUP,
         item: props.group,
         collect: (monitor) => ({
@@ -40,12 +39,15 @@ export function GroupView(props: {
                 return;
             }
 
-            const droppedGroup = item as Group;
-            moveItem(
-                droppedGroup,
-                props.app.items.indexOf(props.group),
-                props.app.items
-            );
+            const droppedItem = item
+            if ((droppedItem instanceof Group) || (droppedItem instanceof Note)) {
+                moveItem(
+                    droppedItem,
+                    props.app.items.indexOf(props.group),
+                    props.app.items
+                );
+            }
+            
             return;
         },
     }));
@@ -76,11 +78,10 @@ export function GroupView(props: {
             >
                 <GroupToolbar pile={props.group} app={props.app} />
                 <NoteContainer
-                    pile={props.group}
-                    clientId={props.clientId}
-                    selection={props.selection}
-                    setSelection={props.setSelection}
+                    group={props.group}
+                    clientId={props.clientId}                    
                     session={props.session}
+                    fluidMembers={props.fluidMembers}
                 />
             </div>
         </div>
@@ -90,7 +91,7 @@ export function GroupView(props: {
 function GroupName(props: { pile: Group }): JSX.Element {
     return (
         <input
-            className="flex-1 block mb-2 text-lg font-bold text-black bg-transparent"
+            className="flex w-0 grow p-1 mb-2 mr-2 text-lg font-bold text-black bg-transparent"
             type="text"
             value={props.pile.name}
             onChange={(event) => (props.pile.name = event.target.value)}
@@ -100,7 +101,7 @@ function GroupName(props: { pile: Group }): JSX.Element {
 
 function GroupToolbar(props: { pile: Group; app: App }): JSX.Element {
     return (
-        <div className="flex gap-y-1">
+        <div className="flex flex-row justify-between">
             <GroupName pile={props.pile} />
             <DeletePileButton pile={props.pile} app={props.app} />
         </div>

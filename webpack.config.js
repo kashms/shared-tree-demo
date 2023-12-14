@@ -3,7 +3,6 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
@@ -11,7 +10,7 @@ module.exports = {
     entry: './src/index.tsx',
     // Necessary in order to use source maps and debug directly TypeScript files
     devtool: 'source-map',
-    mode: 'production',
+    mode: 'development',
     performance: {
         maxAssetSize: 4000000,
         maxEntrypointSize: 4000000,
@@ -23,24 +22,7 @@ module.exports = {
                 test: /\.ts$|tsx/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
-            },
-            {
-                test: /\.scss$/,
-                use: [
-                    // { loader: 'style-loader' },
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: 'css-loader',
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true,
-                            // options...
-                        },
-                    },
-                ],
-            },
+            },            
             {
                 test: /\.css$/,
                 use: [
@@ -69,8 +51,8 @@ module.exports = {
     plugins: [
         // No need to write a index.html
         new HtmlWebpackPlugin({
-            title: 'Shared-Tree-Demo',
-            favicon: 'favicon.ico',
+            title: 'Brainstorm Demo',
+            favicon: '',
         }),
         // Load environment variables during webpack bundle
         new Dotenv({

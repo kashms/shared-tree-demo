@@ -3,9 +3,8 @@ import {
     ITokenProvider,
     ITokenResponse,
 } from '@fluidframework/azure-client';
-
 import axios from 'axios';
-import { generateTestUser } from './utils';
+import { generateTestUser } from '../utils/utils';
 
 /**
  * Token Provider implementation for connecting to an Azure Function endpoint for
@@ -19,7 +18,7 @@ export class AzureFunctionTokenProvider implements ITokenProvider {
      */
     constructor(
         private readonly azFunctionUrl: string,
-        private readonly user?: Pick<AzureMember, 'userName' | 'additionalDetails'>
+        private readonly user?: Pick<AzureMember, 'userName' | 'userId' | 'additionalDetails'>
     ) {}
 
     public async fetchOrdererToken(
@@ -49,6 +48,7 @@ export class AzureFunctionTokenProvider implements ITokenProvider {
                 tenantId,
                 documentId,
                 userName: this.user?.userName,
+                userId: this.user?.userId,
                 additionalDetails: this.user?.additionalDetails,
             },
         });
